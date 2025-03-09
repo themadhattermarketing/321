@@ -1,0 +1,150 @@
+---
+---
+
+<div class="bg-white rounded-lg shadow-lg p-6 md:p-8" x-data="quoteCalculator()">
+  <h3 class="text-2xl font-bold mb-6 text-center">Get Your Moving Estimate</h3>
+  
+  <div class="space-y-6">
+    <div>
+      <label class="block text-gray-700 font-medium mb-2">Type of Move</label>
+      <select 
+        x-model="moveType" 
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <option value="residential">Residential Moving</option>
+        <option value="commercial">Commercial Moving</option>
+        <option value="specialty">Fine Art & Specialty Items</option>
+        <option value="junk">Junk Removal</option>
+      </select>
+    </div>
+    
+    <div>
+      <label class="block text-gray-700 font-medium mb-2">Size of Property</label>
+      <select 
+        x-model="propertySize" 
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+      >
+        <option value="studio">Studio Apartment (400-600 sq ft)</option>
+        <option value="1br">1 Bedroom Apartment/House (700-900 sq ft)</option>
+        <option value="2br">2 Bedroom Apartment/House (1000-1200 sq ft)</option>
+        <option value="3br">3 Bedroom House (1300-1800 sq ft)</option>
+        <option value="4br">4+ Bedroom House (1900+ sq ft)</option>
+        <option value="office-small">Small Office (up to 2000 sq ft)</option>
+        <option value="office-medium">Medium Office (2000-5000 sq ft)</option>
+        <option value="office-large">Large Office (5000+ sq ft)</option>
+      </select>
+    </div>
+    
+    <div>
+      <label class="block text-gray-700 font-medium mb-2">Distance (miles)</label>
+      <input 
+        type="number" 
+        x-model="distance" 
+        min="1" 
+        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+        placeholder="Enter distance in miles"
+      />
+    </div>
+    
+    <div class="pt-4 border-t border-gray-200">
+      <div class="flex justify-between mb-2">
+        <span class="font-medium">Base Rate:</span>
+        <span x-text="'$' + baseRate.toFixed(2)"></span>
+      </div>
+      <div class="flex justify-between mb-2">
+        <span class="font-medium">Distance Charge:</span>
+        <span x-text="'$' + distanceCharge.toFixed(2)"></span>
+      </div>
+      <div class="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
+        <span>Estimated Total:</span>
+        <span x-text="'$' + totalEstimate.toFixed(2)"></span>
+      </div>
+    </div>
+    
+    <div class="mt-6">
+      <a 
+        href="/contact" 
+        class="block w-full bg-secondary hover:bg-secondary-light text-white text-center font-bold py-3 px-4 rounded-md transition duration-300"
+      >
+        Request Booking
+      </a>
+    </div>
+  </div>
+  
+  <div class="mt-8 text-sm text-gray-600">
+    <p class="mb-2"><strong>Note:</strong> This is an estimate only. Final pricing may vary based on specific requirements, stairs, elevators, and other factors.</p>
+    <p>Our professional team will provide a detailed quote after assessing your specific moving needs.</p>
+  </div>
+</div>
+
+<script>
+  function quoteCalculator() {
+    return {
+      moveType: 'residential',
+      propertySize: 'studio',
+      distance: 10,
+      
+      get baseRate() {
+        const rates = {
+          residential: {
+            'studio': 300,
+            '1br': 450,
+            '2br': 650,
+            '3br': 850,
+            '4br': 1200
+          },
+          commercial: {
+            'office-small': 800,
+            'office-medium': 1500,
+            'office-large': 2500
+          },
+          specialty: {
+            'studio': 400,
+            '1br': 550,
+            '2br': 750,
+            '3br': 950,
+            '4br': 1400,
+            'office-small': 900,
+            'office-medium': 1700,
+            'office-large': 2800
+          },
+          junk: {
+            'studio': 200,
+            '1br': 300,
+            '2br': 400,
+            '3br': 500,
+            '4br': 700,
+            'office-small': 600,
+            'office-medium': 1000,
+            'office-large': 1800
+          }
+        };
+        
+        // Handle residential property sizes for commercial move type
+        if (this.moveType === 'commercial' && !this.propertySize.includes('office')) {
+          return 0;
+        }
+        
+        // Handle office property sizes for residential move type
+        if (this.moveType === 'residential' && this.propertySize.includes('office')) {
+          return 0;
+        }
+        
+        // Get the appropriate rate
+        if (rates[this.moveType] && rates[this.moveType][this.propertySize]) {
+          return rates[this.moveType][this.propertySize];
+        }
+        
+        return 0;
+      },
+      
+      get distanceCharge() {
+        return this.distance * 1; // $1 per mile
+      },
+      
+      get totalEstimate() {
+        return this.baseRate + this.distanceCharge;
+      }
+    };
+  }
+</script>
